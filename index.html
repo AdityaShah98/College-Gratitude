@@ -3,7 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Gratitude</title>
+    <style type="text/css">
+        html, body {
+            margin: 0;
+        }
+    </style>
+    <script src="js/pixi.min.js"></script>
+    <script src="js/viewport.js"></script>
+    <!-- PIXI.js -->
+    <script>
+        var app;
+        var buttonTexture, downTexture;
+        
+        window.onload = function () {
+            app = new PIXI.Application({ width: window.innerWidth, height: window.innerHeight, backgroundColor: 0x1099bb });
+            document.body.appendChild(app.view);
+
+            //preload assets
+            app.loader.baseUrl = "images";
+            app.loader.add("sprite01", "mj1.png");
+            app.loader.add("sprite02", "mj2.png");
+            app.loader.add("sprite03", "mj3.png");
+            app.loader.add("sprite04", "mj4.png");
+            app.loader.add("sprite05", "mj5.png");
+            app.loader.add("sprite06", "mj6.png");
+            app.loader.add("sprite07", "mj7.png");
+            app.loader.add("sprite08", "mj8.png");
+            app.loader.add("sprite09", "mj9.png");
+            app.loader.add("sprite10", "mj10.png");
+
+            app.loader.onProgress.add(showProgress);
+            app.loader.onComplete.add(doneLoading);
+            app.loader.onError.add(showError);
+
+            app.loader.load();
+        }
+
+        function showProgress(e) {
+            console.log(e.progress);
+        }
+
+        function showError(e) {
+            console.error("ERROR: " + e.message);
+        }
+
+        function doneLoading(e) {
+            console.log("Done loading!");
+            plaza();
+        }
+
+        function plaza() {
+            buttonTexture = app.loader.resources.sprite01.texture;
+            downTexture = app.loader.resources.sprite02.texture;
+
+            const buttons = [];
+            const x_dif = app.view.width/4;
+            const y_dif = app.view.height/4;
+            const buttonPositions = [
+                app.view.width/2 - x_dif, app.view.height/2 - y_dif,
+                app.view.width/2 + x_dif, app.view.height/2 - y_dif,
+                app.view.width/2 - x_dif, app.view.height/2 + y_dif,
+                app.view.width/2 + x_dif, app.view.height/2 + y_dif,
+                app.view.width/2, app.view.height/2,
+            ];
+
+            for (let i = 0; i < buttonPositions.length; i++) {
+                const button = new PIXI.Sprite(buttonTexture);
+
+                button.anchor.set(0.5);
+                button.x = buttonPositions[i * 2];
+                button.y = buttonPositions[i * 2 + 1];
+
+                // make the button interactive...
+                button.interactive = true;
+                button.buttonMode = true;
+
+                button
+                // Mouse & touch events are normalized into
+                // the pointer* events for handling different
+                // button events.
+                    .on('pointerdown', onButtonDown)
+                    .on('pointerup', onButtonUp)
+                    .on('pointerupoutside', onButtonUp)
+                    .on('pointerover', onButtonOver)
+                    .on('pointerout', onButtonOut);
+
+
+                button.scale.set(0.4); //SCALE down michael jackson
+
+                // add it to the stage
+                app.stage.addChild(button);
+                // add button to array
+                buttons.push(button);
+            }
+        }
+
+
+        function onButtonDown() {
+            this.isdown = true;
+            this.texture = downTexture;
+            this.alpha = 1;
+        }
+
+        function onButtonUp() {
+            this.isdown = false;
+            // if (this.isOver) {
+            //     this.texture = textureButtonOver;
+            // } else {
+            //     this.texture = buttonTexture;
+            // }
+            this.texture = buttonTexture;
+        }
+
+        function onButtonOver() { //hover
+            // this.isOver = true;
+            // if (this.isdown) {
+            //     return;
+            // }
+            // this.texture = textureButtonOver;
+        }
+
+        function onButtonOut() {
+            // this.isOver = false;
+            // if (this.isdown) {
+            //     return;
+            // }
+            // this.texture = textureButton;
+        }
+    </script>
 </head>
 <body>
     
