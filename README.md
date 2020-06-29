@@ -1,1 +1,1 @@
-# college-gratitude
+# College Gratitude Website
