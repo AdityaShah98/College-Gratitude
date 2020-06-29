@@ -14,11 +14,37 @@
     <!-- PIXI.js -->
     <script>
         var app;
+        var vp;
         var buttonTexture, downTexture;
         
         window.onload = function () {
             app = new PIXI.Application({ width: window.innerWidth, height: window.innerHeight, backgroundColor: 0x1099bb });
             document.body.appendChild(app.view);
+
+            //create the main viewport
+            vp = new Viewport.Viewport({
+                screenWidth: window.innerWidth,
+                screenHeight: window.innerHeight,
+                worldWidth: 1000,
+                worldHeight: 1000,
+
+                interaction: app.renderer.plugins.interaction // the interaction module is important for wheel to work properly when renderer.view is placed or scaled
+            })
+
+            // add the viewport to the stage
+            app.stage.addChild(vp)
+            // activate plugins
+            vp
+                .drag()
+                .pinch()
+                .wheel()
+                .decelerate()
+
+            // add a red box
+            const sprite = vp.addChild(new PIXI.Sprite(PIXI.Texture.WHITE))
+            sprite.tint = 0xff0000
+            sprite.width = sprite.height = 100
+            sprite.position.set(100, 100)
 
             //preload assets
             app.loader.baseUrl = "images";
@@ -61,11 +87,11 @@
             const x_dif = app.view.width/4;
             const y_dif = app.view.height/4;
             const buttonPositions = [
-                app.view.width/2 - x_dif, app.view.height/2 - y_dif,
-                app.view.width/2 + x_dif, app.view.height/2 - y_dif,
-                app.view.width/2 - x_dif, app.view.height/2 + y_dif,
-                app.view.width/2 + x_dif, app.view.height/2 + y_dif,
-                app.view.width/2, app.view.height/2,
+                200, 400,
+                200, 900,
+                700, 350,
+                400, 600,
+                500, 500,
             ];
 
             for (let i = 0; i < buttonPositions.length; i++) {
@@ -93,7 +119,7 @@
                 button.scale.set(0.4); //SCALE down michael jackson
 
                 // add it to the stage
-                app.stage.addChild(button);
+                vp.addChild(button);
                 // add button to array
                 buttons.push(button);
             }
@@ -130,6 +156,90 @@
             //     return;
             // }
             // this.texture = textureButton;
+        }
+
+        // hit area where alpha = 1 (no transparent boxes)
+        PIXI.Sprite.prototype.containsPoint = function (point) {
+            const tempPoint = {x: 0, y: 0 }
+            this.worldTransform.applyInverse(point, tempPoint);
+            console.log(tempPoint);
+
+            const width = this._texture.orig.width;
+            const height = this._texture.orig.height;
+            const x1 = -width * this.anchor.x;
+            let y1 = 0;
+
+            let flag = false;
+
+            if (tempPoint.x >= x1 && tempPoint.x < x1 + width) {
+                y1 = -height * this.anchor.y;
+
+                if (tempPoint.y >= y1 && tempPoint.y < y1 + height) {
+                    flag = true;
+                }
+            }
+
+            if (!flag) {
+                return false
+            }
+            // bitmap check
+            const tex = this.texture;
+            const baseTex = this.texture.baseTexture;
+            const res = baseTex.resolution;
+            if (!baseTex.hitmap) {
+
+                if (!genHitmap(baseTex, 127)) {
+                    return true;
+                }
+                
+            }
+
+            const hitmap = baseTex.hitmap;
+            // this does not account for rotation yet!!!
+            let dx = Math.round((tempPoint.x - x1 + tex.frame.x) * res);
+            let dy = Math.round((tempPoint.y - y1 + tex.frame.y) * res);
+            let ind = (dx + dy * baseTex.realWidth);
+            let ind1 = ind % 32;
+            let ind2 = ind / 32 | 0;
+            return (hitmap[ind2] & (1 << ind1)) !== 0;
+        }
+
+        function genHitmap(baseTex, threshold) {
+            if (!baseTex.resource) {
+                //renderTexture
+                return false;
+            }
+            const imgSource = baseTex.resource.source;
+            let canvas = null;
+            if (!imgSource) {
+                return false;
+            }
+            let context = null;
+            if (imgSource.getContext) {
+                canvas = imgSource;
+                context = canvas.getContext('2d');
+            } else if (imgSource instanceof Image) {
+                canvas = document.createElement('canvas');
+                canvas.width = imgSource.width;
+                canvas.height = imgSource.height;
+                context = canvas.getContext('2d');
+                context.drawImage(imgSource, 0, 0);
+            } else {
+                //unknown source;
+                return false;
+            }
+
+            const w = canvas.width, h = canvas.height;
+            let imageData = context.getImageData(0, 0, w, h);
+            let hitmap = baseTex.hitmap = new Uint32Array(Math.ceil(w * h / 32));
+            for (let i = 0; i < w * h; i++) {
+                let ind1 = i % 32;
+                let ind2 = i / 32 | 0;
+                if (imageData.data[i * 4 + 3] >= threshold) {
+                    hitmap[ind2] = hitmap[ind2] | (1 << ind1);
+                }
+            }
+            return true;
         }
     </script>
 </head>
