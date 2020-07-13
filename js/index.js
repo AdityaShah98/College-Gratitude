@@ -28,7 +28,6 @@ PIXI.settings.PRECISION_FRAGMENT = PIXI.PRECISION.HIGH;
 // }
 
 var body = document.getElementById("main");
-console.log(body);
 app = new PIXI.Application({ width: window.innerWidth, height: window.innerHeight, backgroundColor: 0x1099bb, resolution: window.devicePixelRatio || 1, antialias: true});
 var renderer = PIXI.autoDetectRenderer(800, 600,{backgroundColor : 0x1099bb, antialias: true, resolution: window.devicePixelRatio});
 
@@ -139,7 +138,7 @@ function plaza() {
         //use z index
 
         button.name = data[i].image; //identifier
-        button.anchor.set(0.5);
+        button.anchor.set(0.5,0.1); //sets anchor approx at their head
         // console.log(positions_dict[image_filenames[i]]);
         button.x = data[i].x;
         button.y = data[i].y;
@@ -150,6 +149,8 @@ function plaza() {
         button.buttonMode = true;
         // button.anchor.set(0.5);
 
+        console.log(window.innerWidth)
+        console.log(window.innerHeight)
         button
         // Mouse & touch events are normalized into
         // the pointer* events for handling different
@@ -158,10 +159,12 @@ function plaza() {
                                             // this.texture = app.loader.resources["Alicia_Keys.png"].texture;
                                             //if no text is open, allow clicks. if a textbox is open, you must click x (or escape) before changing!
                                             //snap/snapzoom to this.name's position
-                                            vp.snap(this.x+250,this.y-75, {removeOnComplete: true});
+                                            vp.snapZoom({width: 400, removeOnComplete: true});
+                                            vp.snap(this.x-window.innerWidth/7,this.y-60, {topLeft: true, removeOnComplete: true});
+                                            // vp.snap(this.x+250,this.y+window.innerHeight/5, {removeOnComplete: true});
                                             // vp.follow(this);
                                             // vp.snap(positions_dict[this.name][0],positions_dict[this.name][1], {removeOnComplete: true, removeOnInterrupt: true});
-                                            vp.snapZoom({width: 400, removeOnComplete: true});
+                                            
                                             // vp.snapZoom({width: 400, removeOnComplete: false});
                                             console.log(this.name);
                                             this.alpha = 1;})
