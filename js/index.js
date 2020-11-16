@@ -5,6 +5,9 @@ var data_json = '{"_blockspring_spec":true,"_errors":[],"data":[{"name":"Abby Fi
 var obj = JSON.parse(data_json);
 var data = obj.data;
 var NUM_PEOPLE = data.length;
+var nameToTextbox = {}; //map from name to generated textbox
+var activeName = null;
+
 PIXI.settings.PRECISION_FRAGMENT = PIXI.PRECISION.HIGH;
 // PIXI.settings.ROUND_PIXELS = true;
 
@@ -28,8 +31,11 @@ PIXI.settings.PRECISION_FRAGMENT = PIXI.PRECISION.HIGH;
 // }
 
 var body = document.getElementById("main");
-app = new PIXI.Application({ width: window.innerWidth, height: window.innerHeight, backgroundColor: 0x1099bb, resolution: window.devicePixelRatio || 1, antialias: true});
-var renderer = PIXI.autoDetectRenderer(800, 600,{backgroundColor : 0x1099bb, antialias: true, resolution: window.devicePixelRatio});
+//no antialiasing (wasn't doing anything)
+app = new PIXI.Application({ width: window.innerWidth, height: window.innerHeight, backgroundColor: 0xfff3c9, resolution: window.devicePixelRatio});
+// var renderer = PIXI.autoDetectRenderer(800, 600,{backgroundColor : 0xfff3c9, resolution: window.devicePixelRatio});
+// PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.LINEAR;
+// PIXI.settings.MIPMAP_TEXTURES = PIXI.MIPMAP_MODES.ON;
 
 body.appendChild(app.view);
 
@@ -42,6 +48,7 @@ vp = new Viewport.Viewport({
 
     interaction: app.renderer.plugins.interaction // the interaction module is important for wheel to work properly when renderer.view is placed or scaled
 });
+//configure plaza boundaries
 vp.clampZoom({minWidth: 400, minHeight: 400, maxWidth: 3500, maxHeight: 3500});
 // vp.clamp({left: -2000, right: 2000, top: -2000, bottom: 2000});
 
@@ -49,18 +56,14 @@ vp.clampZoom({minWidth: 400, minHeight: 400, maxWidth: 3500, maxHeight: 3500});
 app.stage.addChild(vp)
 // app.stage.sortableChildren = true;
 // activate plugins
+
+//enable vp 
 vp
     .drag()
     .pinch()
     .wheel()
     .decelerate()
 
-
-// add a red box
-// const sprite = vp.addChild(new PIXI.Sprite(PIXI.Texture.WHITE))
-// sprite.tint = 0xff0000
-// sprite.width = sprite.height = 100
-// sprite.position.set(100, 100)
 
 
 //preload assets
@@ -93,9 +96,67 @@ function doneLoading(e) {
     plaza();
 }
 
+function makeTextboxes(){
+    //returns a container with all generated textboxes
+    var textGroup = new  PIXI.Container();
+
+    for (let i = 0; i < NUM_PEOPLE; i++) {
+        var textbox = generateTextbox(data[i]);
+        textbox.visible = 0;
+        nameToTextbox[data[i].name] = textbox;
+        textGroup.addChild(textbox);
+    }
+
+    return textGroup;
+}
+
+
+function generateTextbox(person){
+    const HEIGHT = 200;
+    const WIDTH = 250;
+    var name = person.name; //for now
+    var text = person.text;
+    
+    var scrollboxSettings = {boxWidth: WIDTH, boxHeight: HEIGHT, overflowX: 'none', dragScroll: true }
+    const scrollbox = new Scrollbox.Scrollbox(scrollboxSettings);
+    scrollbox.position.set(person.x+40, person.y)
+    scrollbox.sortableChildren = true;
+
+    // var textSettings = new Pixi.TextStyle({fontFamily : 'Arial', fontSize: 12,  align : 'left', wordWrap: true, wordWrapWidth: WIDTH - scrollbox.scrollbarSize - 4});
+    const textSettings = new PIXI.TextStyle({
+        fontFamily: "Comic Sans MS",
+        fontSize: 12,
+        fill: 0x333333,
+        alight: 'left',
+        wordWrap: true,
+        wordWrapWidth: WIDTH - scrollbox.scrollbarSize - 4
+    });
+
+
+    // add text body to the scrollbox's content
+    const textSprite = new PIXI.Text(text, textSettings)
+    // scrollbox.beginFill(0xff0000, 0.25).drawRect(0,0,WIDTH,textSprite.height)
+    background = scrollbox.addChild(new PIXI.Sprite(PIXI.Texture.WHITE))
+    background.width = WIDTH;
+    if (textSprite.height < HEIGHT) {
+        background.height = textSprite.height
+        scrollbox.height = textSprite.height
+    } else{
+        background.height = HEIGHT;
+    }
+    textSprite.x = 2;
+    textSprite.y = 0;
+    background.tint = 0xfff3c9;
+    background.zIndex = -1;
+    scrollbox.content.addChild(textSprite);
+    scrollbox.update();
+    return scrollbox;
+
+}
+
 function plaza() {
 
-    const buttons = [];
+    // const buttons = [];
 
 
     vp.sortableChildren = true;
@@ -106,6 +167,7 @@ function plaza() {
     // var shadowGroup = new PIXI.display.Group(-1, false);
     var backgroundGroup = new PIXI.Container();
     var peopleGroup = new  PIXI.Container();
+    var textGroup = new  PIXI.Container();
     // peopleGroup.on('sort', (sprite) => {
     //     // people go down
     //     sprite.zOrder = sprite.y;
@@ -135,9 +197,10 @@ function plaza() {
         // var downTexture = app.loader.resources[image_filenames[j]].texture; //same for now
 
         const button = new PIXI.Sprite(buttonTexture);
+        button.scale.set(0.25);
         //use z index
 
-        button.name = data[i].image; //identifier
+        button.name = data[i].name; //identifier
         button.anchor.set(0.5,0.1); //sets anchor approx at their head
         // console.log(positions_dict[image_filenames[i]]);
         button.x = data[i].x;
@@ -159,8 +222,15 @@ function plaza() {
                                             // this.texture = app.loader.resources["Alicia_Keys.png"].texture;
                                             //if no text is open, allow clicks. if a textbox is open, you must click x (or escape) before changing!
                                             //snap/snapzoom to this.name's position
-                                            vp.snapZoom({width: 400, removeOnComplete: true});
-                                            vp.snap(this.x-window.innerWidth/7,this.y-60, {topLeft: true, removeOnComplete: true});
+                                            if (activeName){
+                                                nameToTextbox[activeName].visible = 0;
+                                            }
+                                            activeName = this.name;
+                                            nameToTextbox[this.name].visible = 1;
+                                            // vp.snapZoom({width: 400, removeOnComplete: true});
+                                            // vp.snap(this.x-window.innerWidth/7,this.y-60, {topLeft: true, removeOnComplete: true});
+
+
                                             // vp.snap(this.x+250,this.y+window.innerHeight/5, {removeOnComplete: true});
                                             // vp.follow(this);
                                             // vp.snap(positions_dict[this.name][0],positions_dict[this.name][1], {removeOnComplete: true, removeOnInterrupt: true});
@@ -185,28 +255,26 @@ function plaza() {
                                             // this.texture = buttonTexture;
                                         })
             .on('pointerover', onButtonOver)
-            .on('pointerout', onButtonOut);
-
-        // if (i < image_filenames.length-1){
-        //     button.scale.set(0.125); //SCALE down michael jackson
-        // } else {
-        //     button.scale.set(0.25); 
-        // }                  
-        button.scale.set(0.25);            
+            .on('pointerout', onButtonOut);    
         
 
                                         
         //add it to the group
-
-        // add it to the stage
-        // vp.addChild(button);
         peopleGroup.addChild(button);
+
+        //add text to vp
+        // textGroup.addChild(generateTextbox(data[i]));
         
         // add button to array
-        buttons.push(button);
+        // buttons.push(button);
     }
+
+    var textGroup = makeTextboxes();
+
+    // add it to the stage
     vp.addChild(backgroundGroup);
     vp.addChild(peopleGroup);
+    vp.addChild(textGroup);
     vp.sortChildren;
     app.stage.sortChildren;
 }
