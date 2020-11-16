@@ -1,0 +1,60 @@
+.topnav {
+    /* rounded corners */
+    border-top-left-radius:30px;
+    border-bottom-left-radius:30px;  
+    border-top-right-radius:30px;
+    border-bottom-right-radius:30px;
+    background-color: rgba(241, 222, 181, 0.5);
+    overflow: hidden;
+    position: fixed; /* Set the navbar to fixed position */
+    top: 2%; /* Position the navbar at the top of the page */
+    right: 3%;
+    width: 94%; /* Full width */
+    text-align: center;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+/* float: left; */
+color: #333333; 
+padding: 14px 16px;
+text-decoration: none;
+font-size: 17px;
+/* display: inline-block; */
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+background-color: #ddd;
+color: black;
+}
+
+/* Add a color to the active/current link */
+.topnav a.active {
+/* background-color: #4CAF50; */
+/* color: white; */
+}
+
+.nav-borderleft {
+    /* border-top-left-radius:30px;
+    border-bottom-left-radius:30px;    */
+}
+    
+.nav-borderright {
+    /* border-top-right-radius:30px;
+    border-bottom-right-radius:30px;   */
+}
+
+.splash {
+    overflow: hidden;
+    position: absolute;
+    width: 40%;
+    height: 40%;
+    background-color: #333333;
+    z-index: 2;
+}
+
+/* #main {
+    position: fixed;
+    z-index: 1;
+} */
