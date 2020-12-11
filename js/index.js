@@ -82,8 +82,10 @@ app.loader.onError.add(showError);
 
 app.loader.load();
 
+var bar = new ldBar('#loadingBar')
 
 function showProgress(e) {
+    bar.set(e.progress, true)
     console.log(e.progress);
 }
 
@@ -93,7 +95,15 @@ function showError(e) {
 
 function doneLoading(e) {
     console.log("Done loading!");
+    bar.set(e.progress, true)
+    console.log(e.progress);
     plaza();
+    showEnterButton();
+}
+
+function showEnterButton(){
+    const enter = document.getElementById("enter");
+    enter.style.display = "block";
 }
 
 function makeTextboxes(){
@@ -379,4 +389,12 @@ function genHitmap(baseTex, threshold) {
         }
     }
     return true;
+}
+
+
+/* Clase Splash Screen function */
+function closeSplash(){
+    console.log("entered closeSplash() function")
+    const splash = document.getElementById("splashWindow");
+    splash.style.display = "none";
 }

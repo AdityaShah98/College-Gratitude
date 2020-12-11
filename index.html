@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/loading-bar.css"/>
     <title>Notes from College</title>
 
     <div class="topnav">
@@ -24,17 +25,18 @@
     
 </head>
 
-<div class = "splash">
-
+<div id = "splashWindow" class = "splash">
+    <button id = "enter" onclick="closeSplash()" style = "display: none">Enter</button>
+    <!-- <div data-type="fill" data-fill-dir="ltr" data-img="images/NFClogo.svg" data-value="50"></div> -->
+    <div id="loadingBar" class="ldBar" data-value="0" data-preset="energy">
+    </div>
 </div>
 
-<body id = "main">
+<body id = "main"></body>
 
-    
-</body>
-
+<script src="js/loading-bar.js"></script>
 <script src="js/pixi.min.js"></script>
 <script src="js/viewport.js"></script>
 <script src="js/scrollbox.js"></script>
-<script src = "js/index.js"></script>
+<script src="js/index.js"></script>
 </html>
