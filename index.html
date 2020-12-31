@@ -25,12 +25,22 @@
     
 </head>
 
-<div id = "splashWindow" class = "splash">
-    <button id = "enter" onclick="closeSplash()" style = "display: none">Enter</button>
-    <!-- <div data-type="fill" data-fill-dir="ltr" data-img="images/NFClogo.svg" data-value="50"></div> -->
-    <div id="loadingBar" class="ldBar" data-value="0" data-preset="energy">
+<div class = "splash">
+    <div id = "splashWindow">
+        <div id = "title">Notes from College</div>
+        <button id = "enter" onclick="closeSplash()" style = "visibility: hidden">Enter</button>
+        <!-- <div data-type="fill" data-fill-dir="ltr" data-img="images/NFClogo.svg" data-value="50"></div> -->
+        <div id="loadingBar" class="ldBar" data-value="0" data-preset="energy"></div>
     </div>
 </div>
+
+<div class = "modal">
+    <h2 id = "modalTitle">My Name</h2>
+    <button id= "modalExit" onclick="closeModal()">X</button>
+    <div id = "modalPicture"></div>
+    <div id = "scrollText">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Facilisi etiam dignissim diam quis enim lobortis scelerisque fermentum. Ultrices neque ornare aenean euismod elementum. Eget velit aliquet sagittis id consectetur purus ut faucibus pulvinar. Nullam non nisi est sit. Turpis egestas pretium aenean pharetra magna ac placerat. Dolor morbi non arcu risus quis. Enim ut sem viverra aliquet eget sit amet. Vitae aliquet nec ullamcorper sit. Hendrerit dolor magna eget est lorem ipsum dolor sit. Fusce ut placerat orci nulla pellentesque dignissim enim sit amet. Pellentesque id nibh tortor id aliquet lectus proin nibh nisl. Feugiat scelerisque varius morbi enim nunc faucibus. Nisl condimentum id venenatis a condimentum vitae sapien pellentesque habitant. Elementum nibh tellus molestie nunc non. Viverra tellus in hac habitasse platea dictumst vestibulum rhoncus. Sed id semper risus in hendrerit gravida. Tortor consequat id porta nibh venenatis cras sed.</div>
+</div>
+
 
 <body id = "main"></body>
 

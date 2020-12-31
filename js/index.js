@@ -103,7 +103,7 @@ function doneLoading(e) {
 
 function showEnterButton(){
     const enter = document.getElementById("enter");
-    enter.style.display = "block";
+    enter.style.visibility = "visible";
 }
 
 function makeTextboxes(){
@@ -236,6 +236,7 @@ function plaza() {
                                                 nameToTextbox[activeName].visible = 0;
                                             }
                                             activeName = this.name;
+                                            openModal(this.name); //open the modal
                                             nameToTextbox[this.name].visible = 1;
                                             // vp.snapZoom({width: 400, removeOnComplete: true});
                                             // vp.snap(this.x-window.innerWidth/7,this.y-60, {topLeft: true, removeOnComplete: true});
@@ -394,7 +395,29 @@ function genHitmap(baseTex, threshold) {
 
 /* Clase Splash Screen function */
 function closeSplash(){
-    console.log("entered closeSplash() function")
-    const splash = document.getElementById("splashWindow");
+    console.log("entered closeSplash() function");
+    const splash = document.getElementsByClassName("splash")[0];
     splash.style.display = "none";
+}
+
+function openModal(name){
+    console.log("openModal() for " + name);
+    const modal = document.getElementsByClassName("modal")[0];
+    modal.style.display = "block";
+    disablePlazaInteraction();
+}
+
+function closeModal(){
+    console.log("closeModal()" );
+    const modal = document.getElementsByClassName("modal")[0];
+    modal.style.display = "none";
+    enablePlazaInteraction();
+}
+
+function disablePlazaInteraction(){
+    /* TODO: disable input to plaza */
+}
+
+function enablePlazaInteraction(){
+    /* TODO: enable input to plaza */
 }
