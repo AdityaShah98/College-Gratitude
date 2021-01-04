@@ -6,6 +6,7 @@ var obj = JSON.parse(data_json);
 var data = obj.data;
 var NUM_PEOPLE = data.length;
 var nameToTextbox = {}; //map from name to generated textbox
+var nameToDescription = {};
 var activeName = null;
 
 PIXI.settings.PRECISION_FRAGMENT = PIXI.PRECISION.HIGH;
@@ -109,6 +110,10 @@ function showEnterButton(){
 function makeTextboxes(){
     //returns a container with all generated textboxes
     var textGroup = new  PIXI.Container();
+
+    for (let i = 0; i < NUM_PEOPLE; i++) {
+        nameToDescription[data[i].name] = data[i].text;
+    }
 
     for (let i = 0; i < NUM_PEOPLE; i++) {
         var textbox = generateTextbox(data[i]);
@@ -402,6 +407,8 @@ function closeSplash(){
 
 function openModal(name){
     console.log("openModal() for " + name);
+    document.getElementById("modalTitle").innerHTML = name;
+    document.getElementById("scrollText").innerHTML = nameToDescription[name];
     const modal = document.getElementsByClassName("modal")[0];
     modal.style.display = "block";
     disablePlazaInteraction();

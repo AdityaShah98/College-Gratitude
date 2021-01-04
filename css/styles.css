@@ -83,6 +83,7 @@ color: black;
 
 .modal {
     position: absolute;
+    font-family: Garamond, Georgia, serif;
     border-radius: 12px;
     background: rgba(201, 201, 201, 1);
     padding: 12px;
@@ -94,7 +95,8 @@ color: black;
   }
   
   .modal #modalExit {
-    color: red
+    color: red;
+    float: right;
   }
   
   .modal #scrollText {
